@@ -1,0 +1,77 @@
+Sub me33k()
+
+Dim w As Worksheet
+Dim nRows As Long
+Dim cel As Byte
+
+
+'CONFIGURANDO A ABA QUE DEVE SER ACESSADO
+Set w = Sheets("REQUISIÇÕES")
+
+'IDENTIFICADOR DAS LINHAS E COLUNAS
+'nRows = w.Cells(w.Rows.Count, 2).End(xlUp).Row
+
+
+If Not IsObject(App) Then
+   Set SapGuiAuto = GetObject("SAPGUI")
+   Set App = SapGuiAuto.GetScriptingEngine
+End If
+If Not IsObject(Connection) Then
+   Set Connection = App.Children(0)
+End If
+If Not IsObject(session) Then
+   Set session = Connection.Children(0)
+End If
+If IsObject(WScript) Then
+   WScript.ConnectObject session, "on"
+   WScript.ConnectObject App, "on"
+End If
+
+'ABRINDO "me33k" CCONSLTAR CONTRATOS
+'session.findBy d("wnd[0]").maximize
+session.findById("wnd[0]/tbar[0]/okcd").Text = "me33k"
+session.findById("wnd[0]").sendVKey 0
+
+
+'### ADICIONANDO O Nº DO CONTRATO ###
+session.findById("wnd[0]/usr/ctxtRM06E-EVRTN").Text = w.Range("D5").Value 'Célula Contrato
+session.findById("wnd[0]").sendVKey 0
+session.findById("wnd[0]/mbar/menu[2]/menu[5]/menu[0]").Select
+
+'### VALORES DO CONTRATO ###
+'NO CONTRATO>MAIS>CABEÇALHO>ESTATÍSTICA>GERAL:
+'a) SELECIONAR O CAMPO DE 'VALOR FIXADO'
+session.findById("wnd[0]/usr/txtEKKO-KTWRT").SetFocus
+w.Cells(22, 5) = session.findById("wnd[0]/usr/txtEKKO-KTWRT").Text 'VALOR FIXADO NA CÉLULA REQUISIÇÕES/E22
+'b) SELECIONAR O CAMPO DE 'VALOR LÍQUIDO'
+session.findById("wnd[0]/usr/txtRM06E-GSABW").SetFocus
+w.Cells(22, 6) = session.findById("wnd[0]/usr/txtRM06E-GSABW").Text 'VALOR LÍQUIDO
+'c) SELECIONANDO CAMPO "Fornecedor"
+session.findById("wnd[0]/usr/ctxtEKKO-LIFNR").SetFocus
+w.Cells(13, 2) = session.findById("wnd[0]/usr/ctxtEKKO-LIFNR").Integer 'SALVANDO Nº CÓDG. FORNECEDOR NA TABELA
+
+
+'### RETORNANDO PARA A SINTESE DO CONTRATO ###
+session.findById("wnd[0]/tbar[1]/btn[5]").press
+
+
+'### COPIANDO CONDIÇÃO E PRAZO DE PAGAMENTO ###
+session.findById("wnd[0]/tbar[1]/btn[6]").press 'SAP/CONTRATO/DETALHES DO CABEÇALHO (F6)
+
+session.findById("wnd[0]/usr/ctxtEKKO-ZTERM").SetFocus
+w.Cells(13, 6) = session.findById("wnd[0]/usr/ctxtEKKO-ZTERM").Text
+
+session.findById("wnd[0]/usr/txtEKKO-ZBD1T").SetFocus
+w.Cells(13, 7) = session.findById("wnd[0]/usr/txtEKKO-ZBD1T").Text
+
+'### RETORNANDO PARA A SINTESE DO CONTRATO ###
+session.findById("wnd[0]/tbar[1]/btn[5]").press
+
+
+'######################
+'     PARA FAZER
+'######################
+'SEM ACRÉSCIMOS POR ENQUANTO (08/08/2023)
+
+End Sub
+
