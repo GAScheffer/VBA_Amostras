@@ -1,0 +1,33 @@
+' ESTE SCRIPT SERVE PARA TRANFERIR OS DADOS USADOS NA CRIAÇÃO DE REQUISIÇÃO PARA ABA PEDIDOS CRIADOS
+
+Sub transferirDadosPedidos()
+
+
+    Dim wsSource As Worksheet
+    Dim wsDest As Worksheet
+    Dim lstRow As Long
+    
+
+    Set wsSource = ThisWorkbook.Sheets("REQUISIÇÃO")
+    Set wsDest = ThisWorkbook.Sheets("PEDIDOS_CRIADOS")
+    Set wsPrin = ThisWorkbook.Sheets("PRINCIPAL")
+
+' Copiar os dados da planilha de origem (A2:AL2)
+    wsSource.Range("A2:AL2").Copy
+
+' Encontrar a próxima linha em branco na planilha de destino
+    lastRow = wsDest.Cells(wsDest.Rows.Count, "A").End(xlUp).Row + 1
+
+' Colar os dados na próxima linha em branco da planilha de destino
+    wsDest.Cells(lastRow, "A").PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+    
+
+' Tornar a planilha de origem ativa (opcional)
+    wsPrin.Activate
+    
+'LIMPANDO DADOS DE ENTRADA
+wsPrin.Range("A5:I8,B15:G18,A22:G22,A25").Select
+Selection.ClearContents
+Range("A5").Select
+End Sub
+
